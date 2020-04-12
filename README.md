@@ -1,9 +1,24 @@
-# 如何记录element后台管理系统中表单（表格？）的修改痕迹
-> 大家好我是极速网吧的黑网吧天才少年，这篇文章记录一下工作中遇到的一个比较有意思的需求，防止下次开发的时候忘记，同时希望大佬们给点优化建议，solo开发属实提心吊胆
+# heiwangbatiancaishaonian
 
-最近接了个需求，要求我写一个表格，这个表格用户可以自由增加删除行以及修改行内的数据，同时记录下用户的操作，在上传数据的时候提示用户进行了哪些操作。具体看动图：
+## Project setup
+```
+yarn install
+```
 
-![](C:\Users\surface\Desktop\demand.gif)
+### Compiles and hot-reloads for development
+```
+yarn serve
+```
 
-## 看下后台返回的数据结构：
+### Compiles and minifies for production
+```
+yarn build
+```
 
+### Lints and fixes files
+```
+yarn lint
+```
+
+### Customize configuration
+See [Configuration Reference](https://cli.vuejs.org/config/).
