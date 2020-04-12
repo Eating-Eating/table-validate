@@ -63,7 +63,6 @@
 </template>
 
 <script>
-let originMap = new Map()
 export default {
   name: 'app',
     data() {
@@ -73,6 +72,7 @@ export default {
         innerVisible:false,
         tempSectionID:Number,
         myTable:[],
+        originTable:[],
         tempRow:{},
         //验证类
         validateState:'error',
@@ -94,17 +94,14 @@ export default {
           section_name:row.section_name,
           grade_name:key
         }))
-        
-        this.myTable.forEach(key =>{
-          originMap.set(key.grade_name,key.id)
-        })
+        this.originTable = JSON.parse(JSON.stringify(this.myTable))
       },
       handleBeforeClose(done){
       this.$confirm("编辑的内容尚未保存，确定关闭弹窗吗？")
         .then(() => {
           this.tempRow = {}
           this.myTable = []
-          originMap = new Map()
+          this.originTable = []
           this.errorObj = {}
           console.log('tag', '')
           try {
@@ -125,7 +122,11 @@ export default {
       delClass(asd,$index){
         this.myTable.splice($index,1)
       },
+
       putGrades(){
+        
+        //初步判断是否修改
+        if(JSON.stringify(this.originTable) === JSON.stringify(this.myTable)) return
         //去空
         this.myTable = this.myTable.filter(key=> key.grade_name.trim() !== '')
         // 验证重复
@@ -134,24 +135,30 @@ export default {
         this.myTable.forEach((key,index)=>{
           if(map.has(key.grade_name)){
             let oldVal = map.get(key.grade_name)
+            map.delete(key.grade_name)
             map.set(key.grade_name,[...oldVal,index])
             return
           }
           map.set(key.grade_name,[index])
         })
-        console.log('map', map)
         map.forEach((value)=>{
           if(value.length > 1){
             value.forEach(key=> { 
               //存入重复项以及验证错误的原因
-              this.$set(this.errorObj,key,'老八不喜欢重复的食物！')
+              this.$set(this.errorObj,key,'年级重复！')
             })
           }
         })
         //有重复阻止发送请求
         if(Object.keys(this.errorObj).length !== 0) return
         //修改痕迹
+        let edited = new Map()
+        let noIDGrade = []
         //第1步，判断新旧是否有重名，有重名的先直接去掉,属于不变的组
+        let originMap = new Map()
+        this.originTable.forEach(key =>{
+          originMap.set(key.grade_name,key.id)
+        })
         let tempNew = this.myTable.filter((key) => {
           if(originMap.has(key.grade_name)) {
             originMap.delete(key.grade_name)
@@ -162,10 +169,7 @@ export default {
         //第2.1步，判断有id的名字是否一致，不一致属于修改组
         //第2.2步，判断新旧带id的数量是否一致，origin少了的部分为删除组
         //第3步，剩下的都是新增组
-        //反转originMap中键值对
-        
-        let edited = new Map()
-        let noIDGrade = []
+        //反转originMap
         let idMap = new Map()
         originMap.forEach((value,key)=>{
           idMap.set(value,key)
@@ -219,7 +223,7 @@ export default {
             
           this.tempRow = {}
           this.myTable = []
-          originMap = new Map()
+          this.originTable = []
           this.errorObj = {}
           this.editDialog = false
           })
